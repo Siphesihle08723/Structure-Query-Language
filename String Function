@@ -1,0 +1,48 @@
+CREATE TABLE string_finction (
+  id INT,
+  name VARCHAR(20),
+  surname VARCHAR(20),
+  job VARCHAR(20),
+  hire_date DATE,
+  phone_number VARCHAR(20)
+);
+
+INSERT INTO string_finction (id, name, surname, job, hire_date, phone_number)
+VALUES
+  (1, 'Siphesihle', ' Sibiya   ', 'HR  ', '2019-10-16', ' +27719648020'),
+  (2, 'Lungelo', 'Ngcobo  ', 'It  ', '2018-11-20', ' +27719648020'),
+  (3, 'Siyabonga', ' Nhlengethwa   ', '   Finance  ', '2019-10-02', ' +27719648020'),
+  (4, 'Thando', '  Ngwenya   ', 'Marketing  ', '2019-11-16', ' +27719648020');
+
+SELECT * FROM string_finction;/* Select all rows */
+SELECT * FROM string_finction;
+
+/* Length of phone_number */
+SELECT LENGTH(phone_number) AS number_length FROM string_finction;
+
+/* Uppercase name */
+SELECT UPPER(name) AS UpperCase FROM string_finction;
+
+/* Lowercase surname */
+SELECT LOWER(surname) AS LowerCase FROM string_finction;
+
+/* Left 4 characters of name */
+SELECT LEFT(name, 4) AS left_chars FROM string_finction;
+
+/* Right 4 characters of name */
+SELECT RIGHT(name, 4) AS right_chars FROM string_finction;
+
+/* Trim name (remove spaces) */
+SELECT TRIM(name) AS trimName FROM string_finction;
+
+/* Trim surname */
+SELECT TRIM(surname) AS trimSurname FROM string_finction;
+
+/* Concatenate name and surname with email format */
+SELECT CONCAT(LOWER(TRIM(name)), '.', LOWER(TRIM(surname)), '@gmail.com') AS email FROM string_finction;
+
+/* Extract day from hire_date */
+SELECT DAY(hire_date) AS hire_day FROM string_finction;
+
+/* Extract month from hire_date */
+SELECT MONTH(hire_date) AS hire_month FROM string_finction;
