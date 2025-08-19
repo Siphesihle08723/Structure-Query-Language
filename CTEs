@@ -1,0 +1,101 @@
+--Create database and use after
+CREATE DATABASE CTEs;
+USE CTEs;
+
+-- create table department
+
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY,
+    DepartmentName VARCHAR(50)
+);
+
+--insert values into department
+
+INSERT INTO Departments (DepartmentID, DepartmentName) VALUES
+(1, 'IT'),
+(2, 'HR'),
+(3, 'Finance');
+
+-- create table employees
+
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Salary DECIMAL(10,2),
+    DepartmentID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);
+
+-- insert values into Employees
+
+INSERT INTO Employees (EmployeeID, Name, Salary, DepartmentID) VALUES
+(1, 'Alice', 5000, 1),
+(2, 'Bob', 6000, 1),
+(3, 'Charlie', 5500, 2),
+(4, 'David', 7000, 3),
+(5, 'Eve', 6500, 3);
+
+
+Select*
+From Employees;
+
+Select*
+From Departments;
+
+/* CTE to select all employees who earn more than 6000  employees table*/
+
+With HighEarners as (
+
+ 		Select EmployeeID,Name, Salary, DepartmentID
+		From Employees
+		Where Salary >=6000)
+Select*
+from HighEarners;
+
+/* CTE to list all departments whose names start with the letter 'H' from the Departments table*/
+
+
+With HDepartment as(
+  
+  select DepartmentID, DepartmentName
+  from Departments
+  where DepartmentName  "H%")
+  
+Select *
+from HDepartment;
+
+/* Multiple CTEs
+Create two CTEs: - DeptAvg → calculate the average salary per department from the Employees
+table. - TopEarners → select employees who earn more than the average salary in their department.
+Then, join with Departments to show employee name, salary, and department name. - Tables:
+Employees , Departments */
+
+WITH DeptAvg AS (
+    SELECT DepartmentID, AVG(Salary) AS AvgSalary
+    FROM Employees
+    GROUP BY DepartmentID
+),
+TopEarners AS (
+    SELECT e.EmployeeID, e.Name, e.Salary, e.DepartmentID
+    FROM Employees e
+    JOIN DeptAvg d 
+      ON e.DepartmentID = d.DepartmentID
+    WHERE e.Salary > d.AvgSalary
+)
+SELECT t.Name, t.Salary, d.DepartmentName
+FROM TopEarners t
+JOIN Departments d
+ ON t.DepartmentID = d.DepartmentID;
+ 
+/* CTE to rank employees by salary within each department, then select only the top 2 earners per
+department.*/
+
+ WITH RankedEmployees AS (
+            SELECT EmployeeID, Name, Salary, DepartmentID,
+            RANK() OVER (PARTITION BY DepartmentID ORDER BY Salary DESC) AS SalaryRank
+            FROM Employees
+)
+SELECT EmployeeID, Name, Salary, DepartmentID
+FROM RankedEmployees
+WHERE SalaryRank <= 2;
+
