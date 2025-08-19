@@ -1,0 +1,114 @@
+-- Create database and use after
+
+CREATE DATABASE EmployeeDB;
+USE EmployeeDB;
+
+-- Create Departments table
+CREATE TABLE Departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(50),
+    location VARCHAR(50)
+);
+
+-- Insert sample departments
+INSERT INTO Departments (department_id, department_name, location) VALUES
+(1, 'HR', 'Johannesburg'),
+(2, 'IT', 'Pretoria'),
+(3, 'Finance', 'Durban'),
+(4, 'Marketing', 'Cape Town'),
+(5, 'Operations', 'Polokwane');
+
+-- Create Employees table
+CREATE TABLE Employees (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department_id INT,
+    hire_date DATE,
+    salary DECIMAL(10,2),
+    phone_number VARCHAR(20),
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+
+-- Insert sample employees
+INSERT INTO Employees (employee_id, first_name, last_name, department_id, hire_date, salary, phone_number) VALUES
+(101, 'Siphesihle', 'Sibiya', 2, '2019-10-16', 28000.00, '+27719648020'),
+(102, 'Lungelo', 'Ngcobo', 2, '2018-11-20', 35000.00, '+27739648021'),
+(103, 'Siyabonga', 'Nhlengethwa', 3, '2020-01-05', 30000.00, '+27759648022'),
+(104, 'Nomvula', 'Khumalo', 1, '2017-08-14', 22000.00, '+27789648023'),
+(105, 'Thabo', 'Mokoena', 4, '2021-03-19', 26000.00, '+27799648024'),
+(106, 'Zanele', 'Dlamini', 5, '2016-06-11', 40000.00, '+27819648025'),
+(107, 'Andile', 'Buthelezi', 3, '2022-09-29', 31000.00, '+27829648026');
+
+/* Retreiving Table departement and Employees*/
+
+Select*
+From Departments;
+
+Select*
+From Employees;
+
+/* Find each employee’s salary and their department’s average salary */
+
+SELECT 
+    emp.first_name,
+    emp.last_name,
+    emp.salary,
+    dep.department_name,
+    AVG(emp.salary) OVER (PARTITION BY dep.department_name) AS avgSal
+FROM Department AS dep
+JOIN Employees AS emp
+    ON dep.department_id = emp.department_id;
+    
+/* Rank employees by salary within each department*/
+SELECT 
+    emp.first_name,
+    emp.last_name,
+    emp.salary,
+    dep.department_name,
+    rank(emp.salary) OVER (PARTITION BY dep.department_name) AS rankSal
+FROM Department AS dep
+JOIN Employees AS emp
+    ON dep.department_id = emp.department_id;
+
+/*Find the highest paid employee(s) in each department.*/
+
+SELECT *
+FROM (
+    SELECT 
+        e.first_name,
+        e.last_name,
+        e.salary,
+        d.department_name,
+        DENSE_RANK() OVER (PARTITION BY d.department_name ORDER BY             e.salary DESC) AS rank_in_dept
+    FROM Employees e
+    JOIN Departments d
+        ON e.department_id = d.department_id
+) ranked
+WHERE rank_in_dept = 1;
+
+/* Show each employee’s salary compared to the previous employee’s salary in the same
+departmenT*/
+
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.department_name,
+    LAG(e.salary) OVER (PARTITION BY d.department_name ORDER BY e.hire_date) AS prev_salary
+FROM Employees e
+JOIN Departments d
+    ON e.department_id = d.department_id;
+/* Calculate the cumulative total salary by hire date (per department) */
+
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.department_name,
+    SUM(e.salary) OVER (PARTITION BY d.department_name ORDER BY e.hire_date) AS running_total_salary
+FROM Employees e
+JOIN Departments d
+    ON e.department_id = d.department_id;
+
+
