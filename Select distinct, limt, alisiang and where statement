@@ -1,0 +1,93 @@
+-- Create a new database
+CREATE DATABASE CompanyDB;
+USE CompanyDB;
+
+-- Create Departments table
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY,
+    DepartmentName VARCHAR(50) NOT NULL,
+    Location VARCHAR(50) NOT NULL
+);
+
+-- Insert data into Departments
+INSERT INTO Departments (DepartmentID, DepartmentName, Location) VALUES
+(1, 'IT', 'Cape Town'),
+(2, 'HR', 'Johannesburg'),
+(3, 'Finance', 'Durban'),
+(4, 'Marketing', 'Pretoria'),
+(5, 'Operations', 'Bloemfontein');
+
+-- Create Employees table
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Salary DECIMAL(10,2) NOT NULL,
+    HireDate DATE NOT NULL,
+    DepartmentID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);
+
+-- Insert data into Employees
+INSERT INTO Employees (EmployeeID, FirstName, LastName, Salary, HireDate, DepartmentID) VALUES
+(101, 'John', 'Mokoena', 35000.00, '2020-01-15', 1),
+(102, 'Sarah', 'Dlamini', 42000.00, '2019-03-10', 2),
+(103, 'Thabo', 'Ndlovu', 50000.00, '2021-07-22', 1),
+(104, 'Lerato', 'Khumalo', 28000.00, '2022-11-30', 3),
+(105, 'Sipho', 'Zulu', 47000.00, '2018-05-19', 4),
+(106, 'Nomsa', 'Mthembu', 33000.00, '2021-09-01', 5),
+(107, 'Kabelo', 'Maseko', 60000.00, '2017-06-14', 1),
+(108, 'Zanele', 'Sithole', 38000.00, '2020-12-05', 2),
+(109, 'Musa', 'Nkosi', 29000.00, '2022-04-16', 5),
+(110, 'Palesa', 'Radebe', 51000.00, '2019-08-09', 3);
+
+
+-- Select all unique locations where employees work
+
+SELECT DISTINCT dep.Location
+FROM Departments as dep
+JOIN Employees as emp
+ON dep.DepartmentID = emp.DepartmentID;
+
+-- Select the top 3 highest-paid employees
+SELECT FirstName, LastName, Salary
+FROM Employees
+ORDER BY Salary DESC  -- Sort salaries in descending order (highest first)
+LIMIT 3; ---- Return only the first 3 rows
+
+-- Aliasing
+-- Display each employee's full name and salary with custom column names
+SELECT CONCAT(FirstName, ' ', LastName) AS FullName,  -- Combine first and last name into a single column called 'FullName'
+       Salary AS MonthlySalary       -- Rename the 'Salary' column as 'MonthlySalary'
+FROM Employees;        
+
+-- Retrieve employees from the IT department earning more than 40,000
+SELECT e.FirstName, e.LastName, e.Salary   
+FROM Employees e                           
+JOIN Departments d                         -
+ON e.DepartmentID = d.DepartmentID         
+WHERE d.DepartmentName = 'IT'             
+  AND e.Salary > 40000;                    
+  
+  -- Retrieve employees with salary below 35,000
+SELECT FirstName, LastName, Salary
+FROM Employees
+WHERE Salary < 35000;  
+
+-- Retrieve employees hired after 2021-01-01
+SELECT FirstName, LastName, HireDate
+FROM Employees
+WHERE HireDate > '2021-01-01';  
+
+-- Retrieve employees working in Finance or Marketing
+SELECT e.FirstName, e.LastName, d.DepartmentName
+FROM Employees e
+JOIN Departments d ON e.DepartmentID = d.DepartmentID
+WHERE d.DepartmentName IN ('Finance', 'Marketing');  
+
+-- Retrieve employees who are not in the IT department
+SELECT e.FirstName, e.LastName, d.DepartmentName
+FROM Employees e
+JOIN Departments d ON e.DepartmentID = d.DepartmentID
+WHERE d.DepartmentName != 'IT';  
+
