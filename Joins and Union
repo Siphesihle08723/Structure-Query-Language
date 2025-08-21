@@ -1,0 +1,53 @@
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    CourseID INT
+);
+
+INSERT INTO Students (StudentID, FirstName, LastName, CourseID) VALUES
+(1, 'Alice', 'Smith', 101),
+(2, 'Bob', 'Johnson', 102),
+(3, 'Charlie', 'Brown', 103),
+(4, 'Diana', 'White', NULL),
+(5, 'Evan', 'Green', 101);
+
+CREATE TABLE Courses (
+    CourseID INT PRIMARY KEY,
+    CourseName VARCHAR(50)
+);
+
+INSERT INTO Courses (CourseID, CourseName) VALUES
+(101, 'Math'),
+(102, 'Science'),
+(103, 'History'),
+(104, 'English');
+
+--LEFT JOIN -
+-- Retrieve all students and their courses, including students not assigned to any course
+SELECT s.FirstName, s.LastName, c.CourseName  
+FROM Students s                              
+LEFT JOIN Courses c ON s.CourseID = c.CourseID;
+-- LEFT JOIN ensures all students appear; CourseName will be NULL if student has no course
+
+-- UNION
+-- Combine lists of students enrolled in Math or Science
+SELECT FirstName, LastName
+FROM Students
+WHERE CourseID = 101  -- Students taking Math
+UNION
+SELECT FirstName, LastName
+FROM Students
+WHERE CourseID = 102; -- Students taking Science
+-- UNION removes duplicate rows, showing each student only once even if they are in both courses
+
+--UNION ALL
+-- Combine lists of students enrolled in Math or Science, including duplicates
+SELECT FirstName, LastName
+FROM Students
+WHERE CourseID = 101
+UNION ALL
+SELECT FirstName, LastName
+FROM Students
+WHERE CourseID = 102;
+-- UNION ALL keeps all rows, so if a student is in both courses, they will appear twice
