@@ -1,0 +1,91 @@
+-- Create a new database
+CREATE DATABASE CompanyDB;
+USE CompanyDB;
+
+-- Create Departments table
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY,
+    DepartmentName VARCHAR(50) NOT NULL,
+    Location VARCHAR(50) NOT NULL
+);
+
+-- Insert data into Departments
+INSERT INTO Departments (DepartmentID, DepartmentName, Location) VALUES
+(1, 'IT', 'Cape Town'),
+(2, 'HR', 'Johannesburg'),
+(3, 'Finance', 'Durban'),
+(4, 'Marketing', 'Pretoria'),
+(5, 'Operations', 'Bloemfontein');
+
+-- Create Employees table
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Salary DECIMAL(10,2) NOT NULL,
+    HireDate DATE NOT NULL,
+    DepartmentID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);
+
+-- Insert data into Employees
+INSERT INTO Employees (EmployeeID, FirstName, LastName, Salary, HireDate, DepartmentID) VALUES
+(101, 'John', 'Mokoena', 35000.00, '2020-01-15', 1),
+(102, 'Sarah', 'Dlamini', 42000.00, '2019-03-10', 2),
+(103, 'Thabo', 'Ndlovu', 50000.00, '2021-07-22', 1),
+(104, 'Lerato', 'Khumalo', 28000.00, '2022-11-30', 3),
+(105, 'Sipho', 'Zulu', 47000.00, '2018-05-19', 4),
+(106, 'Nomsa', 'Mthembu', 33000.00, '2021-09-01', 5),
+(107, 'Kabelo', 'Maseko', 60000.00, '2017-06-14', 1),
+(108, 'Zanele', 'Sithole', 38000.00, '2020-12-05', 2),
+(109, 'Musa', 'Nkosi', 29000.00, '2022-04-16', 5),
+(110, 'Palesa', 'Radebe', 51000.00, '2019-08-09', 3);
+
+-- Display all employee records
+Select *
+From Employees;
+
+-- Display all department records
+Select*
+From Departments;
+
+-- Categorize employees based on salary ranges
+
+SELECT FirstName,LastName, Salary,
+    CASE
+        WHEN Salary > 50000 THEN 'High' -- Salary above 50k
+        WHEN Salary BETWEEN 35000 AND 50000 THEN 'Medium'-- Salary between 35k and 50k
+        WHEN Salary < 35000 THEN 'Low' -- Salary below 35k
+        else 'Unkown' -- Catch-all for null/invalid salaries
+    END AS SalaryCategory
+FROM Employees;
+
+-- Classify employees based on when they were hired
+SELECT FirstName,LastName,HireDate,
+    CASE
+        WHEN HireDate < '2020-01-01' THEN 'Senior'  -- Hired before 2020
+        WHEN HireDate BETWEEN '2020-01-01' AND '2021-12-31' THEN 'Mid Level' -- Hired in 2020 or 2021
+        WHEN HireDate > '2021-12-31' THEN 'Junior'-- Hired after 2021
+        ELSE 'Unknown' -- In case of null/invalid HireDate
+    END AS ExperienceLevel
+FROM Employees;
+
+-- Bonus is calculated differently depending on department
+SELECT FirstName,LastName, DepartmentID,  Salary,
+    CASE
+        WHEN DepartmentID = 'IT' THEN Salary * 0.10 -- 10% for IT
+        WHEN DepartmentID IN ('HR', 'Finance') THEN Salary * 0.05 -- 5% for HR or Finance
+        ELSE Salary * 0.03 -- 3% for all other departments
+    END AS Bonus
+FROM Employees;
+
+
+-- Assigning a job title base on salary range
+SELECT FirstName,LastName,Salary,
+    CASE
+        WHEN Salary > 55000 THEN 'Manager'  -- High salary manager
+        WHEN Salary BETWEEN 40000 AND 55000 THEN 'Team Lead'-- Mid rang salary = team lead
+        ELSE 'Staff' --- Everyone else is Staff
+    END AS Title
+FROM Employees;
+
